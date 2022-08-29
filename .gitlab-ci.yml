@@ -6,7 +6,7 @@ include:
   file: 'helm.gitlab-ci.yml'
   ref: master
 
-image:
+build-image:
   rules:
   - if: $CI_COMMIT_TAG
     variables:
@@ -25,11 +25,11 @@ image:
   script:
     - make
 
-chart:
+build-chart:
   rules:
   - if: $CI_COMMIT_TAG
     variables:
-      PUSH_IMAGE: "true"
+      PUSH_CHART: "true"
   extends: .deploy_helm
   variables:
     REGISTRY_PATH: registry.cern.ch/chartrepo/rvasek
