@@ -6,7 +6,7 @@ include:
   file: 'helm.gitlab-ci.yml'
   ref: master
 
-stage:
+stages:
   - build-image
   - build-chart
 
