@@ -47,4 +47,4 @@ build-chart:
   stage: build-chart
   extends: .deploy_helm
   variables:
-    REGISTRY_PATH: registry.cern.ch/chartrepo/rvasek
+    REGISTRY_CHART_PATH: registry.cern.ch/rvasek/hello-hello
