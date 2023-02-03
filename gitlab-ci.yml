@@ -1,0 +1,50 @@
+include:
+- project: 'ci-tools/container-image-ci-templates'
+  file: 'kaniko-image.gitlab-ci.yml'
+  ref: master
+- project: 'ci-tools/container-image-ci-templates'
+  file: 'helm.gitlab-ci.yml'
+  ref: master
+
+stages:
+  - build-bin
+  - build-image
+  - build-chart
+
+build-bin:
+  stage: build-bin
+  rules:
+    - if: $CI_COMMIT_BRANCH || $CI_COMMIT_TAG
+  image: golang:1.17
+  artifacts:
+    untracked: true
+  before_script:
+    - export PATH="${GOPATH}/bin:${PATH}"
+  after_script:
+    - rm -rf vendor
+  script:
+    - make
+
+build-image:
+  rules:
+  - if: $CI_COMMIT_TAG
+    variables:
+      PUSH_IMAGE: "true"
+  - if: $CI_COMMIT_BRANCH
+  stage: build-image
+  extends: .build_kaniko
+  variables:
+    REGISTRY_IMAGE_PATH: "registry.cern.ch/rvasek/kaniko-mirror-test:$CI_COMMIT_TAG"
+    CONTEXT_DIR: "."
+    DOCKER_FILE_NAME: "image/Dockerfile"
+
+build-chart:
+  rules:
+  - if: $CI_COMMIT_TAG
+    variables:
+      PUSH_CHART: "true"
+  - if: $CI_COMMIT_BRANCH
+  stage: build-chart
+  extends: .deploy_helm
+  variables:
+    REGISTRY_CHART_PATH: registry.cern.ch/rvasek/hello-hello
